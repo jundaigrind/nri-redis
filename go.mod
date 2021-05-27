@@ -5,9 +5,12 @@ go 1.16
 require (
 	github.com/bitly/go-simplejson v0.5.1-0.20181114203107-9db4a59bd4d8
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/golangci/golangci-lint v1.40.0
 	github.com/gomodule/redigo v1.8.4
 	github.com/newrelic/infra-integrations-sdk v3.6.7+incompatible
+	github.com/onsi/ginkgo v1.15.0
+	github.com/onsi/gomega v1.10.5
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/xeipuuv/gojsonschema v1.2.0
