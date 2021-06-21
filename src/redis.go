@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/newrelic/nri-redis/sdk/config"
+
 	sdkArgs "github.com/newrelic/infra-integrations-sdk/args"
 	"github.com/newrelic/infra-integrations-sdk/data/attribute"
 	"github.com/newrelic/infra-integrations-sdk/data/metric"
@@ -19,20 +21,21 @@ import (
 
 type argumentList struct {
 	sdkArgs.DefaultArgumentList
-	Hostname         string       `default:"localhost" help:"Hostname or IP where Redis server is running."`
-	Port             int          `default:"6379" help:"Port on which Redis server is listening."`
-	UnixSocketPath   string       `default:"" help:"Unix socket path on which Redis server is listening."`
-	Keys             sdkArgs.JSON `default:"" help:"List of the keys for retrieving their lengths"`
-	KeysLimit        int          `default:"30" help:"Max number of the keys to retrieve their lengths"`
-	Password         string       `help:"Password to use when connecting to the Redis server."`
-	UseUnixSocket    bool         `default:"false" help:"Adds the UnixSocketPath value to the entity. If you are monitoring more than one Redis instance on the same host using Unix sockets, then you should set it to true."`
-	RemoteMonitoring bool         `default:"false" help:"Allows to monitor multiple instances as 'remote' entity. Set to 'FALSE' value for backwards compatibility otherwise set to 'TRUE'"`
-	ConfigInventory  bool         `default:"true" help:"Provides CONFIG inventory information. Set it to 'false' in environments where the Redis CONFIG command is prohibited (e.g. AWS ElastiCache)"`
+	Hostname         string       `default:"localhost" help:"Hostname or IP where Redis server is running." config:"input;20"`
+	Port             int          `default:"6379" help:"Port on which Redis server is listening." config:"input;5"`
+	UnixSocketPath   string       `default:"" help:"Unix socket path on which Redis server is listening." config:"input;20"`
+	Keys             sdkArgs.JSON `default:"" help:"List of the keys for retrieving their lengths" config:"input;100"`
+	KeysLimit        int          `default:"30" help:"Max number of the keys to retrieve their lengths" config:"input;5"`
+	Password         string       `help:"Password to use when connecting to the Redis server." config:"password;20"`
+	UseUnixSocket    bool         `default:"false" help:"Adds the UnixSocketPath value to the entity. If you are monitoring more than one Redis instance on the same host using Unix sockets, then you should set it to true." config:"checkbox"`
+	RemoteMonitoring bool         `default:"false" help:"Allows to monitor multiple instances as 'remote' entity. Set to 'FALSE' value for backwards compatibility otherwise set to 'TRUE'" config:"checkbox"`
+	ConfigInventory  bool         `default:"true" help:"Provides CONFIG inventory information. Set it to 'false' in environments where the Redis CONFIG command is prohibited (e.g. AWS ElastiCache)" config:"checkbox"`
 	ShowVersion      bool         `default:"false" help:"Print build information and exit"`
+	Config           bool         `default:"false" help:"launch config editor"`
 }
 
 const (
-	integrationName  = "com.newrelic.redis"
+	integrationName  = "com	.newrelic.redis"
 	entityRemoteType = "instance"
 )
 
@@ -46,6 +49,16 @@ var (
 func main() {
 	i, err := createIntegration()
 	fatalIfErr(err)
+
+	if args.Config {
+		configEditorItems, err := config.GetItemsFromArgs(&args)
+		if err != nil {
+			log.Fatal(err)
+		}
+		configEditor := config.NewEditor(configEditorItems)
+		configEditor.Run()
+		os.Exit(0)
+	}
 
 	if args.ShowVersion {
 		fmt.Printf(
