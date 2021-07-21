@@ -78,14 +78,6 @@
                       KeyPath="yes"/>
             </Component>
         </ComponentGroup>
-        <ComponentGroup Id="CustomPluginsComponent" Directory="CustomPluginsFolder">
-            <Component Id="CMP_NRI_$(var.IntegrationName)_DEFINITION_YML" Guid="fbe397af-e27f-4d89-96cd-7395b95800e6" Win64="yes">
-                <File Id="FILE_NRI_$(var.IntegrationName)_DEFINITION_YML"
-                      Name="$(var.IntegrationName)-win-definition.yml"
-                      Source="$(var.BinariesPath)New Relic\newrelic-infra\newrelic-integrations\$(var.IntegrationName)-win-definition.yml"
-                      KeyPath="yes"/>
-            </Component>
-        </ComponentGroup>
         <ComponentGroup Id="PluginConfigsComponent" Directory="PluginConfigsFolder">
             <Component Id="CMP_NRI_$(var.IntegrationName)_CONFIG_YML" Guid="1bf72f1b-9d68-4c59-bd52-be6b7fe2e107" Win64="yes"
                        NeverOverwrite="yes" Permanent="yes">
