@@ -27,7 +27,6 @@
             <ComponentRef Id="CMP_V1_CUSTOM_PLUGINS"/>
             <ComponentRef Id="CMP_V1_CUSTOM_PLUGINS_BIN"/>
             <ComponentGroupRef Id="CustomPluginsBinComponent"/>
-            <ComponentGroupRef Id="CustomPluginsComponent"/>
             <ComponentGroupRef Id="PluginConfigsComponent"/>
         </Feature>
     </Product>
