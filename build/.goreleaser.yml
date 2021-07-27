@@ -77,7 +77,8 @@ archives:
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Version }}_{{ .Arch }}_dirty"
     files:
       - redis-config.yml.sample
-      - legacy/redis-definition.yml
+      - src: legacy/redis-definition.yml
+        dst: redis-definition.yml
     format: tar.gz
 
   - id: nri-win
@@ -86,7 +87,8 @@ archives:
     name_template: "{{ .ProjectName }}-{{ .Arch }}.{{ .Version }}_dirty"
     files:
       - redis-config.yml.sample
-      - legacy/redis-win-definition.yml
+      - src: legacy/redis-win-definition.yml
+        dst: redis-win-definition.yml
     format: zip
 
 # we use custom publisher for fixing archives and signing them
