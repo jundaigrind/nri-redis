@@ -55,7 +55,7 @@ nfpms:
         dst: "/usr/share/doc/nri-redis/README.md"
       - src: "LICENSE"
         dst: "/usr/share/doc/nri-redis/LICENSE"
-      - src: "redis-definition.yml"
+      - src: "legacy/redis-definition.yml"
         dst: "/var/db/newrelic-infra/newrelic-integrations/redis-definition.yml"
         type: config
 
