@@ -55,7 +55,7 @@ nfpms:
         dst: "/usr/share/doc/nri-redis/README.md"
       - src: "LICENSE"
         dst: "/usr/share/doc/nri-redis/LICENSE"
-      - src: "legacy/redis-definition.yml"
+      - src: "redis-definition.yml"
         dst: "/var/db/newrelic-infra/newrelic-integrations/redis-definition.yml"
         type: config
 
@@ -78,6 +78,7 @@ archives:
     files:
       - redis-config.yml.sample
       - src: 'legacy/redis-definition.yml'
+        dst: 'redis-definition.yml'
     format: tar.gz
 
   - id: nri-win
@@ -87,6 +88,7 @@ archives:
     files:
       - redis-config.yml.sample
       - src: 'legacy/redis-win-definition.yml'
+        dst: 'redis-win-definition.yml'
     format: zip
 
 # we use custom publisher for fixing archives and signing them
