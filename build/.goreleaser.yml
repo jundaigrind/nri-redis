@@ -78,7 +78,6 @@ archives:
     files:
       - redis-config.yml.sample
       - src: 'legacy/redis-definition.yml'
-        dst: 'redis-definition.yml'
         strip_parent: true
     format: tar.gz
 
@@ -89,7 +88,6 @@ archives:
     files:
       - redis-config.yml.sample
       - src: 'legacy/redis-win-definition.yml'
-        dst: 'redis-win-definition.yml'
         strip_parent: true
     format: zip
 
