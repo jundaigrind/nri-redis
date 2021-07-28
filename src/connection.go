@@ -1,12 +1,18 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/newrelic/infra-integrations-sdk/log"
+)
+
+var (
+	errorConNetworkFailed = errors.New("redis connection failed, hostname is empty or port is negative")
+	errorConSocketFailed  = errors.New("redis connection failed, unixSocket is empty and UseUnixSocket is specified")
 )
 
 const defaultTimeout = time.Second * 5
@@ -48,7 +54,7 @@ func (c configConnectionError) Error() string {
 
 func newSocketRedisCon(unixSocket string, options ...redis.DialOption) (conn, error) {
 	if unixSocket == "" {
-		return nil, fmt.Errorf("redis connection failed, unixSocket is empty and UseUnixSocket is specified")
+		return nil, errorConSocketFailed
 	}
 	c, err := redis.Dial("unix", unixSocket, options...)
 	if err != nil {
@@ -60,7 +66,7 @@ func newSocketRedisCon(unixSocket string, options ...redis.DialOption) (conn, er
 
 func newNetworkRedisCon(hostname string, port int, options ...redis.DialOption) (conn, error) {
 	if hostname == "" || port <= 0 {
-		return nil, fmt.Errorf("redis connection failed, hostname is empty or port is negative")
+		return nil, errorConNetworkFailed
 	}
 	URL := hostname + ":" + strconv.Itoa(port)
 	c, err := redis.Dial("tcp", URL, options...)
