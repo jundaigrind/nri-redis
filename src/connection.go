@@ -47,27 +47,25 @@ func (c configConnectionError) Error() string {
 }
 
 func newSocketRedisCon(unixSocket string, options ...redis.DialOption) (conn, error) {
-
 	if unixSocket == "" {
 		return nil, fmt.Errorf("redis connection failed, unixSocket is empty and UseUnixSocket is specified")
 	}
 	c, err := redis.Dial("unix", unixSocket, options...)
 	if err != nil {
-		return nil, fmt.Errorf("redis connection through Unix Socket failed, got error: %v", err)
+		return nil, fmt.Errorf("redis connection through Unix Socket failed, got error: %w", err)
 	}
 	log.Debug("Connected to Redis through Unix Socket")
 	return redisConn{c, nil}, nil
 }
 
 func newNetworkRedisCon(hostname string, port int, options ...redis.DialOption) (conn, error) {
-
 	if hostname == "" || port <= 0 {
 		return nil, fmt.Errorf("redis connection failed, hostname is empty or port is negative")
 	}
 	URL := hostname + ":" + strconv.Itoa(port)
 	c, err := redis.Dial("tcp", URL, options...)
 	if err != nil {
-		return nil, fmt.Errorf("redis connection through TCP failed, got error: %v", err)
+		return nil, fmt.Errorf("redis connection through TCP failed, got error: %w", err)
 	}
 	log.Debug("Connected to Redis through TCP")
 
