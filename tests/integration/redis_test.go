@@ -25,12 +25,14 @@ var (
 	defaultBinPath   = "/nri-redis"
 	defaultHost      = "redis"
 	defaultPort      = 6379
+	defaultEnableTLS = false
 
 	// cli flags
 	container = flag.String("container", defaultContainer, "container where the integration is installed")
 	binPath   = flag.String("bin", defaultBinPath, "Integration binary path")
 	host      = flag.String("host", defaultHost, "Redis host ip address")
 	port      = flag.Int("port", defaultPort, "Redis port")
+	enableTLS = flag.Bool("enable_tls", defaultEnableTLS, "Enable TLS")
 )
 
 func runIntegration(t *testing.T, envVars ...string) (stdout string, stderr string) {
@@ -44,18 +46,25 @@ func runIntegration(t *testing.T, envVars ...string) (stdout string, stderr stri
 	if port != nil {
 		command = append(command, "--port", strconv.Itoa(*port))
 	}
+
+	if enableTLS != nil {
+		command = append(command, fmt.Sprintf("--use_tls=%s", strconv.FormatBool(*enableTLS)))
+		command = append(command, fmt.Sprintf("--skip_tls_verify=%s", strconv.FormatBool(*enableTLS)))
+	}
+
 	stdout, stderr, err := helpers.ExecInContainer(*container, command, envVars...)
 
 	if stderr != "" {
 		log.Debug("Integration command Standard Error: ", stderr)
 	}
-	require.NoError(t, err)
+	require.NoError(t, err, stdout)
 
 	return stdout, stderr
 }
 
 func TestMain(m *testing.M) {
 	flag.Parse()
+	log.SetupLogging(true)
 
 	result := m.Run()
 
