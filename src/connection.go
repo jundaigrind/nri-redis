@@ -46,37 +46,48 @@ func (c configConnectionError) Error() string {
 	return "can't execute redis 'CONFIG' command: " + c.cause.Error()
 }
 
-func newRedisCon(hostname string, port int, unixSocket string, password string, useTLS bool, skipTLSVerify bool) (conn, error) {
-	connectTimeout := redis.DialConnectTimeout(defaultTimeout)
-	readTimeout := redis.DialReadTimeout(defaultTimeout)
-	writeTimeout := redis.DialWriteTimeout(defaultTimeout)
-	redisTLSTimeout := redis.DialTLSHandshakeTimeout(defaultTimeout)
-	redisPass := redis.DialPassword(password)
-	redisUseTLS := redis.DialUseTLS(useTLS)
-	redisSkipTLSVerify := redis.DialTLSSkipVerify(skipTLSVerify)
+func newSocketRedisCon(unixSocket string, options ...redis.DialOption) (conn, error) {
 
-	var c redis.Conn
-	var err error
-
-	switch {
-	case unixSocket != "":
-		c, err = redis.Dial("unix", unixSocket, connectTimeout, readTimeout, writeTimeout, redisPass)
-		if err != nil {
-			return nil, fmt.Errorf("Redis connection through Unix Socket failed, got error: %v", err)
-		}
-		log.Debug("Connected to Redis through Unix Socket")
-	case hostname != "" && port > 0:
-		URL := hostname + ":" + strconv.Itoa(port)
-		c, err = redis.Dial("tcp", URL, connectTimeout, readTimeout, writeTimeout, redisPass, redisTLSTimeout, redisUseTLS, redisSkipTLSVerify)
-		if err != nil {
-			return nil, fmt.Errorf("Redis connection through TCP failed, got error: %v", err)
-		}
-		log.Debug("Connected to Redis through TCP")
-	default:
-		return nil, fmt.Errorf("Redis connection failed, cannot connect either through TCP or Unix Socket")
+	if unixSocket == "" {
+		return nil, fmt.Errorf("redis connection failed, unixSocket is empty and UseUnixSocket is specified")
 	}
+	c, err := redis.Dial("unix", unixSocket, options...)
+	if err != nil {
+		return nil, fmt.Errorf("redis connection through Unix Socket failed, got error: %v", err)
+	}
+	log.Debug("Connected to Redis through Unix Socket")
+	return redisConn{c, nil}, nil
+}
+
+func newNetworkRedisCon(hostname string, port int, options ...redis.DialOption) (conn, error) {
+
+	if hostname == "" || port <= 0 {
+		return nil, fmt.Errorf("redis connection failed, hostname is empty or port is negative")
+	}
+	URL := hostname + ":" + strconv.Itoa(port)
+	c, err := redis.Dial("tcp", URL, options...)
+	if err != nil {
+		return nil, fmt.Errorf("redis connection through TCP failed, got error: %v", err)
+	}
+	log.Debug("Connected to Redis through TCP")
 
 	return redisConn{c, nil}, nil
+}
+
+func getStandardDialOptions(password string) []redis.DialOption {
+	return []redis.DialOption{
+		redis.DialConnectTimeout(defaultTimeout),
+		redis.DialReadTimeout(defaultTimeout),
+		redis.DialWriteTimeout(defaultTimeout),
+		redis.DialPassword(password)}
+}
+
+func getTLSDialOptions(useTLS bool, skipTLSVerify bool) []redis.DialOption {
+	return []redis.DialOption{
+		redis.DialTLSHandshakeTimeout(defaultTimeout),
+		redis.DialUseTLS(useTLS),
+		redis.DialTLSSkipVerify(skipTLSVerify),
+	}
 }
 
 func (r redisConn) GetInfo() (string, error) {
