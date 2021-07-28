@@ -9,6 +9,8 @@ import (
 	"github.com/newrelic/infra-integrations-sdk/log"
 )
 
+const defaultTimeout = time.Second * 5
+
 type conn interface {
 	GetInfo() (string, error)
 	GetConfig() (map[string]string, error)
@@ -45,11 +47,11 @@ func (c configConnectionError) Error() string {
 }
 
 func newRedisCon(hostname string, port int, unixSocket string, password string, useTLS bool, skipTLSVerify bool) (conn, error) {
-	connectTimeout := redis.DialConnectTimeout(time.Second * 5)
-	readTimeout := redis.DialReadTimeout(time.Second * 5)
-	writeTimeout := redis.DialWriteTimeout(time.Second * 5)
+	connectTimeout := redis.DialConnectTimeout(defaultTimeout)
+	readTimeout := redis.DialReadTimeout(defaultTimeout)
+	writeTimeout := redis.DialWriteTimeout(defaultTimeout)
+	redisTLSTimeout := redis.DialTLSHandshakeTimeout(defaultTimeout)
 	redisPass := redis.DialPassword(password)
-	redisTLSTimeout := redis.DialTLSHandshakeTimeout(time.Second * 5)
 	redisUseTLS := redis.DialUseTLS(useTLS)
 	redisSkipTLSVerify := redis.DialTLSSkipVerify(skipTLSVerify)
 
